@@ -33,8 +33,8 @@ contract ForeverMoonToken is Context, IERC20, Ownable {
     uint256 private _tFeeTotal;
     uint256 private _tBurnTotal;
 
-    string private constant _name = 'LuckyRebaseFlection';
-    string private constant _symbol = 'LRF';
+    string private constant _name = 'ForeverMoon';
+    string private constant _symbol = 'FOMO';
 
     address payable devAddress;
 
@@ -152,34 +152,12 @@ contract ForeverMoonToken is Context, IERC20, Ownable {
         return rAmount.div(currentRate);
     }
 
-    function excludeAccount(address account) external onlyOwner() {
-        require(account != 0x10ED43C718714eb63d5aA57B78B54704E256024E, 'We can not exclude Uniswap router.');
-        require(!_isExcluded[account], "Account is already excluded");
-        if(_rOwned[account] > 0) {
-            _tOwned[account] = tokenFromReflection(_rOwned[account]);
-        }
-        _isExcluded[account] = true;
-        _excluded.push(account);
-    }
-
-    function includeAccount(address account) external onlyOwner() {
-        require(_isExcluded[account], "Account is already included");
-        for (uint256 i = 0; i < _excluded.length; i++) {
-            if (_excluded[i] == account) {
-                _excluded[i] = _excluded[_excluded.length - 1];
-                _tOwned[account] = 0;
-                _isExcluded[account] = false;
-                _excluded.pop();
-                break;
-            }
-        }
-    }
-
     function isExcludedFromReward(address account) public view returns (bool) {
         return _isExcluded[account];
     }
 
     function excludeFromReward(address account) public onlyOwner {
+        require(account != 0x10ED43C718714eb63d5aA57B78B54704E256024E, 'We can not exclude Uniswap router.');
         require(!_isExcluded[account], "Account is already excluded");
         if (_rOwned[account] > 0) {
             _tOwned[account] = tokenFromReflection(_rOwned[account]);
@@ -393,17 +371,17 @@ contract ForeverMoonToken is Context, IERC20, Ownable {
     }
 
     function _setTaxFee(uint256 taxFee) external onlyOwner() {
-        require (taxFee <= 10, "setTaxFee: tax must be below 10%.");
+        require (taxFee <= 1000, "setTaxFee: tax must be below 10%.");
         _taxFee = taxFee;
     }
 
     function _setBurnFee(uint256 burnFee) external onlyOwner() {
-        require (burnFee <= 10, "setBurnFee: tax must be below 10%.");
+        require (burnFee <= 1000, "setBurnFee: tax must be below 10%.");
         _burnFee = burnFee;
     }
 
     function _setDevFee(uint256 devFee) external onlyOwner() {
-         require (devFee <= 10, "setDevFee: tax must be below 10%.");
+         require (devFee <= 1000, "setDevFee: tax must be below 10%.");
         _devFee = devFee;
     }
 
@@ -422,6 +400,7 @@ contract ForeverMoonToken is Context, IERC20, Ownable {
     }
 
     function claimReward () public {
+        require(!_isExcluded[msg.sender], "Account is can not be excluded from reward."); 
         require (balanceOf(msg.sender) > 0, "claimReward: user token must be greater then Zero.");        
         require (claimCount[msg.sender] < getGolbalClaimCount(), "claimReward: user already claimed in this period.");
 
