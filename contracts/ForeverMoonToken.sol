@@ -36,7 +36,7 @@ contract ForeverMoonToken is Context, IERC20, Ownable {
     string private constant _name = 'ForeverMoon';
     string private constant _symbol = 'FOMO';
 
-    address payable devAddress;
+    address devAddress;
 
     IUniswapV2Router02 public immutable uniswapV2Router;
     address public immutable uniswapV2Pair;
@@ -46,7 +46,7 @@ contract ForeverMoonToken is Context, IERC20, Ownable {
     uint256 private _burnFee = 100;
     uint256 private _previousTaxFee = _taxFee;
 
-    constructor (address payable _devAddress, address payable _ownerAddress) public {
+    constructor (address _devAddress, address _ownerAddress) public {
         _rOwned[_ownerAddress] = _rTotal;
 
         IUniswapV2Router02 _uniswapV2Router = IUniswapV2Router02(0x10ED43C718714eb63d5aA57B78B54704E256024E);
